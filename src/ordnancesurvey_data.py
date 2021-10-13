@@ -1,9 +1,7 @@
-import os
 import shutil
 import geopandas
 import pandas as pd
 from icecream import ic
-from pathlib import Path
 
 from download_utils import download_latest_file
 from set_parameters import download_dir, data_dir, crs_bng
@@ -55,23 +53,7 @@ def create_address_aoi(aoi_gdf):
     ic("unzipping address file")
     _unzip_file(_address_zip_fpath, download_dir)
 
-    #######
-    # New GPKG based code
-    # address_all_fpath = f"{download_dir}/osopenuprn_202108.gpkg"
-    # address_all_lyr_name = "osopenuprn_address"
-    # address_all_gdf = geopandas.read_file(address_all_fpath, layer=address_all_lyr_name)
-
-    # # Copy and reproject the `aoi_gdf`. On the assumption that this will be quicker than
-    # # reprojecting the `address_all_gdf`.
-    # reprojected_mask = aoi_gdf.copy().to_crs(address_all_gdf.crs)
-
-    # clipped_gdf = geopandas.clip(address_all_gdf, reprojected_mask)
-    # clipped_gdf.to_file(address_fpath, driver="GPKG", layer=address_lyr_name)
-
-    #######
-    # Old CSV based code
-
-    _address_csv_fpath = f"{download_dir}\osopenuprn_202107.csv"
+    _address_csv_fpath = f"{download_dir}/osopenuprn_202107.csv"
     csv_df = pd.read_csv(_address_csv_fpath)
     ic(len(csv_df))
     ic(csv_df.head())
@@ -86,8 +68,9 @@ def create_address_aoi(aoi_gdf):
     ic(len(csv_df))
 
     aoi_uprn_gdf = geopandas.GeoDataFrame(
-        csv_df, crs=crs_bng,
-        geometry=geopandas.points_from_xy(csv_df.X_COORDINATE, csv_df.Y_COORDINATE)
+        csv_df,
+        crs=crs_bng,
+        geometry=geopandas.points_from_xy(csv_df.X_COORDINATE, csv_df.Y_COORDINATE),
     )
     ic(len(aoi_uprn_gdf))
     ic(aoi_uprn_gdf.head())
